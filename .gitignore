@@ -1,0 +1,20 @@
+# Made by make-usb-installer.sh / Cerbo Setup option U
+venus-data.tar.gz
+venus-data-*.tar.gz
+# Nomadic's documents are their copyrighted material
+*NTL_DCtoDC*.pdf
+*Bidirectional_DCDC_Converter_Manual*.pdf
+# Created while running
+cerbo-ip.txt
+state*.json
+ui*.json
+totals*.json
+*.tmp
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+node_modules/

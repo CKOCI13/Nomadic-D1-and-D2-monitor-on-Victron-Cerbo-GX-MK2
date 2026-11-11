@@ -1,0 +1,160 @@
+# Changelog
+
+What changed in each version of the driver (`VERSION` in `dbus-nomadic-dcdc/dbus-nomadic-dcdc.py`).
+
+This repository starts at 2.0.0, the monitor-only edition. Versions 1.0.0 to 1.3.0 (with control) were developed
+in [cerbo-nomadic-d1](https://github.com/CKOCI13/cerbo-nomadic-d1), where they continue; their entries are kept below for reference.
+
+
+## 2.5.0 (2026-11-07)
+
+**History.** The Cerbo's **History** page for the D1 (Device list › DC-DC D1 › History) was empty, apart from
+"Reset history on the monitor itself", because the monitor only sent live readings. It now keeps running records,
+saved on the Cerbo so they survive restarts, reboots and USB reinstalls, until you clear them:
+
+- **On the Cerbo's History page** (Victron's own layout): **Minimum / Maximum voltage** (48 V side), **Minimum /
+  Maximum aux voltage** (12 V side), **Minimum / Maximum temperature** (the D1's board), **Produced energy** (kWh
+  into the 48 V battery while boosting) and **Consumed energy** (kWh taken from it while bucking), and counts of
+  the D1's own **low / high voltage** warnings on each side. Its **Clear History** button starts them all again.
+- **On the web page**, a new **Records** card shows all of that plus kWh on the 12 V side, peak current on each
+  side, hours boosting, bucking and derating, temperature warnings and alarms, and how many faults the D1 has
+  reported (with the last one and when). `/api/status` has them under `totals`.
+- Energy is added up from every reading (100 a second); a gap of more than a second without readings isn't
+  counted. Lowest and highest values only count while the D1 is running (not while it starts up or shuts down).
+  Boost and buck time come from which way the energy flows, so they count in "Autonomous" mode too.
+- Kept in `totals.json` next to the driver, saved every 5 minutes and when the monitor stops. Cerbo Setup and the
+  USB installer leave it out, so reinstalling doesn't reset it.
+- The one new writable item is `/History/Clear`. It clears the monitor's own records; nothing is sent to the D1.
+- The 24-hour charts are unchanged (still in memory only).
+- New tests: `tests/test_totals.py`.
+
+## 2.4.1 (2026-11-05)
+
+From the first look at the D1 on VRM:
+
+- **VRM's Inputs page tells the two sides apart.** It listed "Current: Current", "Voltage: Voltage" and "Power: Power" twice each, because it ignores the Cerbo's "12 V side" / "48 V side" cards. Each item now reads "Current: 12 V current", "Current: 48 V current" and so on. The Cerbo's cards are unchanged.
+- **Precharge status reads "Not used"** instead of "Reserved" (the CAN document's name for the 0 the D1 sends, as it doesn't use precharge). It's hidden on the Cerbo screen; VRM shows it.
+- **Docs: DVCC temperature sensor.** The Cerbo offers the D1 as a DVCC temperature sensor ("None on CAN vecan1 (monitor only)"). The Installation Guide and driver README now say to leave that on "No sensor" or the battery, so the board temperature is never shared as the battery's.
+## 2.4.0 (2026-11-05)
+
+- **A summary tile at the top of the web page**, styled like the Cerbo's Overview **Battery** tile: the watts (the same figure as the Overview's Alternator tile: + while charging the 48 V battery, − while powering the 12 V side), **Buck** or **Boost**, the 12 V and 48 V sides' **volts** and **amps**, and the **temperature** (top right, orange at the warning, red at the alarm). It has the Battery tile's blue and its rising shimmer while energy is flowing (still when the device asks for reduced motion). Victron's Overview tiles can't be changed by a driver, so this is the place for it.
+- Only the web page changed. The Cerbo's screens, the D-Bus values, VRM and the rest of the web page are exactly as in 2.3.0.
+
+## 2.3.0 (2026-11-05)
+
+The D1's temperature is one of its main operating readings, so it's back on every Cerbo screen, with warnings.
+
+- **On every screen.** The Overview page's Alternator tile shows it (top right), and the device page lists it as "Alternator temperature" (Victron's wording for an alternator). The D1 also appears as a **temperature sensor** named "DC-DC D1": a gauge on **Levels › Environment**, an entry in the device list, a choice for the Brief page's centre circle, and an input for a Cerbo relay's temperature control. Its type is **Water heater** because that is the only gauge scale (32–212 °F) that covers a working D1, which read 180 °F while boosting in the first real test; the Generic gauge stops at 140 °F. With `service_class = dcdc` the device page would call it "Battery temperature", so it is left off that page only.
+- **Warning and alarm.** The D1 says nothing until it starts derating, so the monitor warns first. From the D1 manual (Rev D, IV.B): full output up to 221 °F (105 °C), derating 221–248 °F, fault above 248 °F (120 °C). Defaults: **warning at 212 °F (100 °C)**, **alarm at 221 °F (105 °C)**, in a new `[temperature]` part of `config.ini`. The Cerbo shows a **High Temperature** notification (and passes it to VRM), the switch pane's Alarm item names it ("Temperature high" / "Temperature very high", red at the alarm), and the web page shows the level and a message. Each clears 5 °F (3 °C) below where it came on.
+- **Fahrenheit** (from the 2.1.3 update that hadn't been merged yet). The web page shows temperatures in the unit set on the Cerbo (**Settings → General → Display & Appearance → Data units → Temperature**), the same unit the Cerbo screen and VRM use. The live reading, chart and history table follow it. `temperature_unit = fahrenheit` or `celsius` in `[web]` forces one; on a PC (`--simulate` or `--no-dbus`) the page shows °F. The Safe Test Plan, "How it works" and the Cerbo pictures give °F first.
+- New tests: `tests/test_temperature_levels.py`, `tests/test_temperature_unit.py`.
+
+## 2.2.0 (2026-11-04)
+
+From the first test on real hardware (Cerbo GX, Venus OS v3.85, a D1 boosting from a running engine):
+
+- **Shown as an alternator by default** (`service_class = alternator`). Victron's system calculation leaves DC-DC converters out of its sums, so the Cerbo's **DC Loads** figure went negative (−1,413 W) while the D1 charged the Lithionics battery. As an alternator, the D1's power into or out of the 48 V battery is counted, and the D1 gets its own **tile on the Overview page**: + watts while it charges the 48 V battery, − watts while it powers the 12 V side from it. Its device page now shows the 48 V side as Output and the 12 V side as Input. Nothing is sent to the D1: the service has no `/Link/*` paths, so DVCC writes nothing. `service_class = dcdc` gives the old listing.
+- **Direction from the operating mode.** While boosting, the D1 reported both currents as positive (13.0 V / 132 A on the 12 V side, 54.2 V / 30 A on the 48 V side), so the web page's flow arrow pointed the wrong way and the device page couldn't tell the directions apart. While the D1 says it's boosting or bucking, the monitor now sets the signs from that (+ = into that battery) everywhere: D-Bus, switch pane, web page and history. The values as received are kept as `lv_current_reported` / `hv_current_reported` in `/api/status`.
+- **No more "Battery temperature".** The D1's own temperature was published as `/Dc/0/Temperature`, which the device page labelled "Battery temperature". It's left out there now; the switch pane and web page still show it. (2.3.0 brings it back on the alternator's page and tile.)
+- New tests (`tests/test_direction.py`) use the readings from that test. README "Project status" updated with what the real hardware showed.
+
+## 2.1.3 (2026-11-04)
+
+- **Fix: the driver crashed on the Cerbo GX as soon as it opened the CAN port.** The Cerbo runs 32-bit Python, where Python's `socket.CAN_EFF_FLAG` is a negative number, and building the CAN receive filter from it failed with `struct.error: 'I' format requires 0 <= number <= 4294967295`. The service then restarted every few seconds, so the converter never stayed on the Cerbo's screen or in the device list. The driver now uses the fixed values from Linux's `can.h`. The tests ran on 64-bit PCs, where the constant is positive, so they missed it; a new test (`tests/test_can_filter_32bit.py`) builds the filter with the 32-bit value. Found in the first test on real hardware.
+
+## 2.1.2 (2026-10-29)
+
+- **Stricter automatic port detection.** `interface = auto` now only accepts a CAN port once it has heard 8-byte frames of both the converter's status (0x066) and readings (0x088), so a stray frame on another bus that happens to use one of those IDs isn't mistaken for the converter. (The monitor still never transmits anything.)
+
+## Documentation update 2 (2026-10-25, driver unchanged)
+
+- **Plain-language pass** for the README, Installation Guide and Safe Test Plan: long sentences split up, the troubleshooting checklist made into a numbered list, and new glossary entries (lever connector, current limit, Automatic with limits).
+- **New test, `tests/test_spec_conformance.py`:** checks the driver independently against Nomadic's CAN interface document, the Rev D manual and Victron's USB install script.
+
+## Documentation update (2026-10-25, driver unchanged)
+
+- **Cable: no CAN ground wire.** The Cerbo and the D1 already share the van's negative, and the Cerbo's VE.Can 2 port isn't isolated, so the white/green wire (RJ45 pin 3) is now left unused and insulated. The guide adds a one-time check of the voltage between the Cerbo's negative and the D1's GND.
+- **Joining with lever connectors.** The D1's signal plug already has labelled CAN_H and CAN_L wires, so the guide now joins them to the network cable's brown pair with two 3-way lever wire connectors (e.g. WAGO 221-413), with the 120 Ω resistor between the connectors. No crimping.
+- **New wiring pictures** from one shared source (`docs/src/wiring.html`, rebuilt with `node docs/src/build-wiring.cjs`), including a close-up of the two lever connectors and the resistor. Installation Guide, Safe Test Plan, driver reference, README and "How it works" updated.
+
+## 2.1.1 (2026-10-25)
+
+- **CAN port profile you can actually choose:** the guide said to set the converter's port to *Up, but no services*. Victron's current screen software (gui-v2, Venus OS v3.80+) hides that option and won't let you pick it. The guide, the driver reference and the `--scan` advice now say **VE.Can (250 kbit/s)** or **CAN-bus BMS LV (500 kbit/s)**; the driver reference shows how to set *Up, but no services* over SSH if you want it.
+- **Start-up script fix (USB stick and normal installs):** Venus OS only runs `/data/rc.local` when it is executable, and when another add-on ends that file with `exit 0`, a line added after it never runs. `install.sh` now puts its line before the first top-level `exit`, moves it there if an older version left it after one, and always makes the file executable. New tests cover it, and the USB file was checked against Victron's own `update-data.sh`.
+- **USB file names:** the README and guide now warn that a browser-renamed file such as `... (1).tar.gz` is skipped by the Cerbo (names with spaces don't work) and must be renamed back.
+- **D1 manual Rev D:** references updated from Rev C. The guide now gives Rev D's fuses: 3 A for KL30 and 1 A for KL15.
+- **LTV1 FAQ:** explains that this edition can't protect a stock LTV1's 2 AWG / 150 A wiring, and points to the control edition's limits.
+- **KL15 joined to KL30** (as on the LTV1): troubleshooting now says to pull that wire's fuse to restart the D1.
+
+## 2.1.0 (2026-10-17): test release
+
+- **Finds its CAN port by itself:** `interface = auto` is the new default. The driver listens on every CAN
+  port and uses the one it hears the D1 on, so the same file works on any Cerbo (`can1` on the original,
+  `vecan1` on the MK2) with no settings to edit. It only ever listens. The device page shows the port it found.
+- **USB stick / SD card installs once:** the file is now `venus-data-nomadic-d1-monitor.tar.gz`, and after installing, the
+  Cerbo renames it on the stick to `...tar.gz.installed`, so leaving the stick in can't reinstall it or put old
+  settings back. A ready-made file is attached to each release, so you no longer need to build it.
+- **Venus OS "Modification checks":** the guide now says to check that modifications are enabled (the default);
+  when they are off, Venus OS disables the start-up script and the driver disappears after a restart.
+- **Cerbo CAN port instructions:** the guide and README now cover both Cerbo models. On a **Cerbo GX MK2**, use
+  **VE.Can 2** with "Up, but no services". On an **original Cerbo GX**, the BMS-Can port only runs at 500 kbit/s and
+  can't be set to "Up, but no services", which the old step 3c asked for.
+- **Install from a USB stick or SD card, with no network or SSH:** `Cerbo Setup.bat` option U (or
+  `make-usb-installer.sh`) makes the installer file; Venus OS unpacks it at boot and its hook installs the service.
+
+## 2.0.0 (2026-10-14): monitor only
+
+The driver is now a **monitor**: it listens to the D1 and never sends it anything. Control (Automatic / Off / Buck /
+Boost, set-points, current limits, precharge, test timer) has been removed completely, because it isn't known what
+the D1 does when command frames stop. The control version continues in [cerbo-nomadic-d1](https://github.com/CKOCI13/cerbo-nomadic-d1).
+
+- **Nothing can transmit:** the CAN socket is receive-only, the EMS_DCDC_CTRL encoder is gone, D-Bus has no
+  writable values (only screen-item names, cards and visibility), and the web page is read-only (`405` for anything
+  but `GET`). A test walks the code to make sure no way to send comes back.
+- **New Cerbo screen layout:** three cards: the converter (alarm, status, temperature), its 12 V side and its 48 V
+  side (current, **power** and voltage each). The device page has no on/off switch any more.
+- **Web page with charts:** power, both voltages and temperature over 10 min / 1 h / 6 h / 24 h, with a shared
+  crosshair, an energy-flow strip and a table view. New `GET /api/history`. The history (one 10 s average per point,
+  24 hours) is kept in memory.
+- **`--monitor`** also prints the power on each side.
+- **Simulation:** the pretend D1 now also boosts, driven by a 12 V side that alternates between a load and a
+  charging source.
+- **`config.ini`:** the `[control]` section is gone. Old files still work; the section is ignored.
+- **Documents and pictures rebuilt:** new Installation Guide and Safe Test Plan (four stages, none of which can
+  change what the D1 does), new Cerbo, VRM, web-page and explainer pictures, and their sources in `docs/src`
+  with a build script.
+
+## 1.3.0 (2026-10-06): safe testing
+
+- **Simulation mode** (`--simulate`, Cerbo Setup option 9). The real driver runs against a pretend D1 and never
+  opens a CAN socket. It registers separately, so it can run next to a real installation.
+- **Test timer** (`test_timer` in `config.ini`): Buck or Boost switches itself to Off after a set number of minutes.
+- **"Find the converter"** now shows each port's bitrate and CAN state, and spots a D1 talking at the other
+  speed from the bus error count.
+- **Buck target default 13.5 V,** the usual target for charging chassis batteries.
+- **Safe Test Plan** document.
+
+## 1.2.0 (2026-10-05): matched to the D1 manual
+
+- **Automatic mode is the default.** The driver sends nothing and the D1 runs on its own logic, exactly as without
+  a Cerbo. Off, Buck and Boost take control only when chosen.
+- **Separate buck and boost current limits,** because the D1's limits differ by direction (178 A / 57 A).
+- **Limits match the D1 manual:** buck target 10–13.5 V, boost target 42–57.8 V.
+- **Cable instructions match the D1's 6-pin signal connector:** CAN-H on pin 1, CAN-L on pin 2, KL15 / KL30
+  power-up wires, CAN ground to the common ground, and a 120 Ω terminator at the D1.
+- **`--scan`** finds which Cerbo port the converter is on.
+- **`Cerbo Setup.bat`,** a menu-driven Windows helper that copies, tests and installs the driver.
+- Precharge controls are hidden by default. Short status labels fit the GX tiles.
+
+## 1.1.0 (2026-10-05): Victron screen and VRM
+
+- **Readings and controls in the GX switch pane, device page, VRM portal and VRM app,** via Victron's switch API.
+- Names, cards and visibility changed on the GX are remembered.
+- Alarms are sorted most serious first.
+
+## 1.0.0 (2026-10-05): first version
+
+- Decodes the D1's CAN messages and publishes them on D-Bus as a DC-DC converter.
+- Sends the control message every 10 ms, with limits on every value and a pause before reversing direction.
+- Built-in web page with a JSON API and an optional password.
+- `--monitor` listen-only tool. Installs as a Venus OS service that survives firmware updates.

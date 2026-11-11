@@ -1,0 +1,88 @@
+# Publishes one release with both USB installer files attached:
+#   venus-data-nomadic-d1-monitor.tar.gz and venus-data-nomadic-d2-monitor.tar.gz
+# Start it either way:
+#   - Actions tab -> "release" -> "Run workflow", or
+#   - push a tag named v<VERSION>, for example v2.5.0.
+# The release is named after VERSION in D1-monitor/dbus-nomadic-dcdc/dbus-nomadic-dcdc.py.
+# The D2 version must be the same, so owners always get a matching pair.
+name: release
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run the D1 tests
+        working-directory: D1-monitor
+        run: python -m unittest discover -s tests
+      - name: Run the D2 tests
+        working-directory: D2-monitor
+        run: python -m unittest discover -s tests
+      - name: Read the versions
+        id: ver
+        run: |
+          get() { grep -m1 -oE "VERSION *= *['\"][0-9]+\.[0-9]+\.[0-9]+" "$1/dbus-nomadic-dcdc/dbus-nomadic-dcdc.py" | grep -oE "[0-9]+\.[0-9]+\.[0-9]+"; }
+          v1=$(get D1-monitor); v2=$(get D2-monitor)
+          test -n "$v1" && test -n "$v2" || { echo "Could not find VERSION"; exit 1; }
+          if [ "$v1" != "$v2" ]; then echo "D1 is $v1 but D2 is $v2. Make them the same first."; exit 1; fi
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "${GITHUB_REF_NAME}" != "v$v1" ]; then
+            echo "Tag ${GITHUB_REF_NAME} doesn't match VERSION $v1."; exit 1
+          fi
+          echo "version=$v1" >> "$GITHUB_OUTPUT"
+      - name: Stop if this version is already released
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "v${{ steps.ver.outputs.version }}" >/dev/null 2>&1; then
+            echo "Release v${{ steps.ver.outputs.version }} already exists. Bump VERSION for a new one."
+            exit 1
+          fi
+      - name: Build both USB installer files
+        run: |
+          sh D1-monitor/make-usb-installer.sh
+          sh D2-monitor/make-usb-installer.sh
+          mv D1-monitor/venus-data-*.tar.gz D2-monitor/venus-data-*.tar.gz .
+          ls -l venus-data-*.tar.gz
+      - name: Write the release notes
+        run: |
+          v="${{ steps.ver.outputs.version }}"
+          section() {
+            awk -v v="$v" '
+              /^## / { if (found) exit; if (index($0, "## " v " ") == 1 || $0 == "## " v) { found = 1; next } }
+              found' "$1/CHANGELOG.md"
+          }
+          {
+            echo "**Monitor only:** it never sends anything to the converter."
+            echo
+            echo "**Download only one file**, the one for your converter (under **Assets** below):"
+            echo
+            echo "- Nomadic **D1**: \`venus-data-nomadic-d1-monitor.tar.gz\`"
+            echo "- Nomadic **D2**: \`venus-data-nomadic-d2-monitor.tar.gz\`"
+            echo
+            echo "Copy it to the top level of a USB stick, put the stick in the Cerbo and restart the Cerbo."
+            echo "Full steps: [README](https://github.com/${GITHUB_REPOSITORY}#step-4-install-it-from-a-usb-stick)."
+            echo
+            echo "## What's new in $v"
+            echo
+            section D1-monitor
+          } > notes.md
+          cat notes.md
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.ver.outputs.version }}" venus-data-*.tar.gz \
+            --target "${{ github.sha }}" \
+            --title "D1 and D2 monitor v${{ steps.ver.outputs.version }}" \
+            --notes-file notes.md

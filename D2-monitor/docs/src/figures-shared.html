@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Figures</title>
+<!-- The figures shared with the control edition (cerbo-nomadic-d2). Rendered with figures.html by build.cjs (2x scale).
+     Fonts: Nunito and Roboto from Google Fonts, Inter for body text (install them locally if offline). -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&family=Roboto:wght@400;500&display=swap">
+<style>
+  :root {
+    --ink: #111827; --muted: #4b5563; --soft: #6b7280; --line: #d6dce6;
+    --hv: #2f6db3; --lv: #d98a1e; --dev: #3a4552; --gx: #0e131a; --good: #24834b; --bad: #c9403a;
+    --can: #3b82c4; --brown: #8a5a2b; --gnd: #2e9a47; --res: #b85c00; --warn: #b9650f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #888; font-family: Inter, "Liberation Sans", sans-serif; color: var(--ink); }
+  [data-figure] { background: #fff; position: relative; overflow: hidden; margin: 20px; }
+  .round { font-family: Nunito, Inter, sans-serif; font-weight: 900; }
+  .abs { position: absolute; }
+
+  /* ---------------------------------------------------------------- Victron screens (gui-v2 look) */
+  .gx { font-family: Roboto, Inter, sans-serif; color: #fff; }
+  .bezel { position: absolute; inset: 0; background: #262626; border-radius: 24px; }
+  .screen { position: absolute; inset: 30px 34px; background: #000; overflow: hidden; }
+  .topbar { height: 50px; display: flex; align-items: center; justify-content: center; position: relative; font-size: 15px; }
+  .topbar .time { position: absolute; right: 16px; color: #9b9b9b; }
+  .topbar .icons { position: absolute; left: 16px; display: flex; gap: 18px; align-items: center; }
+  .ico-sw { width: 26px; height: 24px; display: grid; gap: 4px; }
+  .ico-sw i { border: 2px solid #9b9b9b; border-radius: 6px; position: relative; }
+  .ico-sw i::after { content: ""; position: absolute; left: 3px; top: 2px; width: 5px; height: 5px; border-radius: 50%; background: #9b9b9b; }
+  .ico-pane { width: 26px; height: 24px; display: grid; gap: 3px; }
+  .ico-pane i { background: #387dc5; border-radius: 3px; }
+  .cards { position: absolute; top: 56px; display: flex; gap: 16px; }
+  .card { background: #141414; border-radius: 8px; padding: 16px 20px 6px; }
+  .card-title { display: flex; align-items: center; gap: 8px; font-size: 17px; margin-bottom: 18px; }
+  .dev { width: 10px; height: 16px; border: 2px solid #fff; border-radius: 3px; position: relative; }
+  .dev::after { content: ""; position: absolute; left: 1px; bottom: 1px; width: 4px; height: 4px; border-radius: 50%; border: 1px solid #fff; }
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; }
+  .item { margin-bottom: 18px; }
+  .item .name { font-size: 16px; margin-bottom: 8px; }
+  .tile { background: #1f1f1f; border-radius: 6px; height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 18px; }
+  .tile .k { color: #8a8a8a; }
+  .drop { background: #13253c; border: 2px solid #387dc5; border-radius: 6px; height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 19px; }
+  .chev { width: 12px; height: 12px; border-right: 2px solid #387dc5; border-bottom: 2px solid #387dc5; transform: rotate(45deg); margin-top: -6px; }
+  .stepper { display: grid; grid-template-columns: 56px 1fr 56px; height: 40px; border: 2px solid #387dc5; border-radius: 6px; overflow: hidden; }
+  .stepper span { display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .stepper span:first-child, .stepper span:last-child { background: #13253c; }
+  .stepper span:nth-child(2) { border-left: 2px solid #387dc5; border-right: 2px solid #387dc5; }
+  .stepper u { text-decoration: none; color: #8a8a8a; margin-left: 4px; }
+
+  /* ---------------------------------------------------------------- phone */
+  .phone { position: absolute; inset: 0; background: #111; border-radius: 40px; }
+  .phone .in { position: absolute; inset: 12px; background: #141414; border-radius: 30px; overflow: hidden; }
+  .appbar { background: #2a2a2a; padding: 22px 16px 0; }
+  .appbar .t { display: flex; gap: 26px; align-items: center; font-size: 19px; }
+  .tabs { display: flex; justify-content: space-around; margin-top: 18px; font-size: 14px; color: #d0d0d0; }
+  .tabs span { padding-bottom: 10px; }
+  .tabs .on { color: #fff; border-bottom: 3px solid #f08a24; }
+  .phone .cards { position: static; flex-direction: column; padding: 0 12px; gap: 10px; }
+  .phone .item { margin-bottom: 12px; } .phone .card-title { margin-bottom: 12px; }
+
+  /* ---------------------------------------------------------------- explainer bits */
+  .box { position: absolute; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .devbox { background: var(--dev); color: #fff; }
+  .gxbox { background: var(--gx); color: #fff; }
+  .code { background: #fff; border: 3px solid var(--line); font-family: "DejaVu Sans Mono", monospace; font-size: 19px; white-space: nowrap; }
+  .tr { background: var(--hv); color: #fff; }
+  .label { position: absolute; font-size: 15px; font-weight: 700; letter-spacing: .03em; color: var(--muted); text-transform: uppercase; }
+  .arrow { position: absolute; height: 4px; background: #4b5563; }
+  .arrow::after { content: ""; position: absolute; right: -2px; top: -8px; width: 14px; height: 14px; border-right: 4px solid #4b5563; border-top: 4px solid #4b5563; transform: rotate(45deg); }
+  .step { position: absolute; bottom: 30px; width: 140px; border: 3px solid var(--good); background: #e8f4ec; border-radius: 12px; text-align: center; padding-top: 12px; }
+  .step .n { color: var(--good); font-size: 32px; line-height: 1; }
+  .step b { display: block; font-size: 14.5px; margin: 6px 6px 4px; }
+  .step span { display: block; color: var(--muted); font-size: 13px; padding: 0 8px; }
+  .bat { position: absolute; border: 3px solid #d6dce6; border-radius: 22px; background: #fff; }
+  .bat .fill { position: absolute; border-radius: 12px; color: #fff; display: flex; align-items: center; justify-content: center; }
+  .bat .post { position: absolute; top: -20px; width: 46px; height: 20px; background: #3a4552; border-radius: 6px 6px 0 0; }
+  .dots { position: absolute; height: 0; border-top: 8px dotted; }
+
+  /* ---------------------------------------------------------------- wiring diagrams */
+  .wd { font-family: Inter, sans-serif; }
+  .pin { position: absolute; border: 2.5px solid var(--can); border-radius: 5px; background: #fff; font-size: 16px; display: flex; align-items: center; padding-left: 12px; font-weight: 500; }
+  .pin.off { border-color: #c4cad3; color: #8a929e; background: #f7f8fa; font-weight: 400; }
+  .pin.gnd { background: #12233a; border-color: #12233a; color: #fff; }
+  .wire { position: absolute; }
+</style>
+</head>
+<body>
+<!-- ======================================================================= today / after -->
+<div data-figure="explained-today" style="width:580px;height:370px">
+  <div class="box gxbox round" style="left:202px;top:26px;width:156px;height:98px;font-size:34px;border-radius:14px">?</div>
+  <div class="abs" style="left:277px;top:128px;height:58px;border-left:5px dashed var(--bad)"></div>
+  <svg class="abs" style="left:259px;top:143px" width="42" height="34" viewBox="0 0 42 34"><path d="M4 4 L38 30 M38 4 L4 30" stroke="#c9403a" stroke-width="5" stroke-linecap="round"/></svg>
+  <div class="bat" style="left:31px;top:192px;width:136px;height:130px"><div class="fill round" style="inset:32px 10px 10px 10px;background:var(--hv);font-size:26px">48 V</div></div>
+  <div class="dots" style="left:168px;top:241px;width:46px;color:var(--lv)"></div>
+  <div class="box devbox round" style="left:217px;top:201px;width:126px;height:87px;font-size:28px;border-radius:12px">D2</div>
+  <div class="dots" style="left:345px;top:241px;width:46px;color:var(--lv)"></div>
+  <div class="bat" style="left:392px;top:223px;width:136px;height:99px"><div class="fill round" style="inset:32px 10px 10px 10px;background:var(--lv);font-size:22px">12 V</div></div>
+</div>
+
+<div data-figure="explained-after" style="width:580px;height:370px">
+  <div class="box gxbox" style="left:202px;top:26px;width:156px;height:98px;border-radius:14px;align-items:flex-start;padding-left:22px">
+    <div style="font-size:12px;color:#b7bec8">DC-DC D2</div><div class="round" style="font-size:26px">13.6 V</div></div>
+  <div class="abs" style="left:362px;top:74px;width:50px;border-top:4px dashed #4b5563"></div>
+  <div class="abs" style="left:420px;top:28px;width:64px;height:104px;border:3px solid #d6dce6;border-radius:12px"><div style="position:absolute;inset:12px 9px;background:var(--gx);border-radius:5px;color:#7fb2ea;font-size:11px;display:flex;align-items:center;justify-content:center">13.6V</div></div>
+  <div class="abs" style="left:419px;top:142px;font-size:15px;color:var(--muted)">VRM app</div>
+  <div class="abs" style="left:277px;top:128px;height:70px;border-left:7px solid var(--can)"></div>
+  <div class="bat" style="left:31px;top:192px;width:136px;height:130px"><div class="fill round" style="inset:32px 10px 10px 10px;background:var(--hv);font-size:26px">48 V</div></div>
+  <div class="dots" style="left:168px;top:241px;width:46px;color:var(--lv)"></div>
+  <div class="box devbox round" style="left:217px;top:201px;width:126px;height:87px;font-size:28px;border-radius:12px">D2</div>
+  <div class="dots" style="left:345px;top:241px;width:46px;color:var(--lv)"></div>
+  <div class="bat" style="left:392px;top:223px;width:136px;height:99px"><div class="fill round" style="inset:32px 10px 10px 10px;background:var(--lv);font-size:22px">12 V</div></div>
+</div>
+
+<!-- ======================================================================= overview -->
+<div data-figure="explained-overview" style="width:1024px;height:500px">
+  <div class="round abs" style="right:656px;top:62px;font-size:24px">Cerbo GX</div>
+  <div class="abs" style="right:656px;top:96px;font-size:16px;color:var(--muted);text-align:right;line-height:1.35">the screen for your<br>whole system</div>
+  <div class="box gxbox" style="left:387px;top:34px;width:238px;height:140px;border-radius:18px">
+    <div style="position:absolute;inset:14px;background:#141c25;border-radius:8px;padding:16px 16px;text-align:left">
+      <div style="font-size:13px;color:#c5cbd3">DC-DC D2</div><div class="round" style="font-size:30px">13.6 V</div><div style="font-size:14px;color:#7fb2ea">Charging</div>
+      <div style="position:absolute;right:16px;top:44px;width:44px;height:34px;background:#3a7ec6;border-radius:4px"></div></div></div>
+  <div class="abs" style="left:504px;top:174px;height:72px;border-left:6px dashed var(--can)"></div>
+  <div class="abs round" style="left:524px;top:194px;font-size:16px;color:var(--can)">the new cable</div>
+  <div class="abs" style="left:524px;top:216px;font-size:14px;color:var(--muted)">(this is what we add)</div>
+  <div class="bat" style="left:60px;top:156px;width:244px;height:256px"><div class="post" style="left:44px"></div><div class="post" style="left:150px"></div><div class="fill round" style="inset:64px 14px 14px 14px;background:var(--hv);font-size:44px">48 V</div></div>
+  <div class="box devbox" style="left:405px;top:260px;width:208px;height:138px;border-radius:18px"><span class="round" style="font-size:38px">D2</span><span style="font-size:16px">the energy pump</span></div>
+  <div class="dots" style="left:322px;top:290px;width:76px;color:var(--lv);border-top-width:9px"></div>
+  <div class="dots" style="left:626px;top:290px;width:76px;color:var(--lv);border-top-width:9px"></div>
+  <svg class="abs" style="left:700px;top:278px" width="24" height="32" viewBox="0 0 24 32"><path d="M4 4 L18 16 L4 28" fill="none" stroke="#d98a1e" stroke-width="5"/></svg>
+  <div class="dots" style="left:316px;top:360px;width:80px;color:var(--hv);border-top-width:9px"></div>
+  <svg class="abs" style="left:298px;top:348px" width="24" height="32" viewBox="0 0 24 32"><path d="M20 4 L6 16 L20 28" fill="none" stroke="#2f6db3" stroke-width="5"/></svg>
+  <div class="dots" style="left:620px;top:360px;width:90px;color:var(--hv);border-top-width:9px"></div>
+  <div class="bat" style="left:727px;top:254px;width:208px;height:158px"><div class="post" style="left:30px"></div><div class="post" style="left:132px"></div><div class="fill round" style="inset:48px 14px 14px 14px;background:var(--lv);font-size:32px">12 V</div></div>
+  <div class="abs round" style="left:60px;width:244px;top:426px;text-align:center;font-size:21px">Big house battery</div>
+  <div class="abs round" style="left:700px;width:262px;top:426px;text-align:center;font-size:21px">Small chassis batteries</div>
+  <div class="abs" style="left:380px;width:258px;top:414px;text-align:center;font-size:17px;font-weight:700;line-height:1.55">
+    <div style="color:var(--lv)">Buck: big helps small →</div><div style="color:var(--hv)">← Boost: small helps big</div></div>
+</div>
+
+</body>
+</html>
