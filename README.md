@@ -6,6 +6,10 @@ Made for owners of **Grand Design Lineage LTV vans**, and anyone else with a Nom
 converter and a Victron **Cerbo GX**. No programming needed: download one file, put it on a USB stick, and restart
 the Cerbo.
 
+> [!TIP]
+> **Just want to install it?** Follow the short **[USB Install Guide](USB-Install-Guide.md)**
+> ([printable PDF](docs/USB-Install-Guide.pdf)).
+
 > [!NOTE]
 > **Monitor only. It only watches and never touches the converter.** It reads the converter's messages and shows
 > them. It has no way to send the converter anything, so it can't change how the converter or your van behaves.
