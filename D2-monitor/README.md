@@ -145,7 +145,7 @@ Venus OS has a built-in way to install add-ons from a USB stick or microSD card.
 This project's hook installs the monitor as a service, so you don't need SSH, a root password or the Superuser
 access level.
 
-1. **Get the file.** Download **`venus-data-nomadic-d2-monitor.tar.gz`** from the [latest release](https://github.com/CKOCI13/Nomadic-D1-and-D2-monitor-on-Victron-Cerbo-GX-MK2/releases/latest). It has the standard settings,
+1. **Get the file.** Download **`venus-data-nomadic-d2-monitor.tar.gz`** from the [Download folder](https://github.com/CKOCI13/Nomadic-D1-and-D2-monitor-on-Victron-Cerbo-GX-MK2/tree/main/Download). It has the standard settings,
    including `interface = auto`, so the monitor finds the D2's CAN port by itself on any Cerbo.
    (On a Mac, download with Chrome or Firefox: Safari can unpack it into a `.tar` file, which the Cerbo ignores.)
 2. **Copy it** to the top folder of a USB stick or SD card (FAT32 is the safe choice), not inside another folder.

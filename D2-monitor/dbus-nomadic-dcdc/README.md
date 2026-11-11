@@ -101,7 +101,7 @@ scp -O -r dbus-nomadic-dcdc root@<GX-IP>:/data/
 
 ### Or: install from a USB stick or SD card
 
-Download `venus-data-nomadic-d2-monitor.tar.gz` from the [latest release](https://github.com/CKOCI13/Nomadic-D1-and-D2-monitor-on-Victron-Cerbo-GX-MK2/releases/latest) (or edit `config.ini` and build your own with
+Download `venus-data-nomadic-d2-monitor.tar.gz` from the [Download folder](https://github.com/CKOCI13/Nomadic-D1-and-D2-monitor-on-Victron-Cerbo-GX-MK2/tree/main/Download) (or edit `config.ini` and build your own with
 `Cerbo Setup.bat` option U or `sh make-usb-installer.sh`), copy it to the top folder of a FAT32 USB stick or SD card,
 put it in the GX and restart. Modifications must be enabled (*Settings › General › Modification checks*, the default).
 Venus OS unpacks it into `/data` and runs its `rc/post-hook.sh`, which runs `install.sh`: steps 4 and 7 are done

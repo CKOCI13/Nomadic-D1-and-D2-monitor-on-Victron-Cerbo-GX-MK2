@@ -18,3 +18,5 @@ __pycache__/
 Thumbs.db
 desktop.ini
 node_modules/
+# ...except the published install files in Download/
+!Download/venus-data-*.tar.gz

@@ -36,8 +36,8 @@ Look at the label on the converter. On an LTV it's usually near the 48 V battery
 
 | You have | Use this folder | Download this file |
 |---|---|---|
-| **Nomadic D1** (four thin labelled wires: CAN_H, CAN_L and two 12 V wires) | [D1-monitor](D1-monitor) | `venus-data-nomadic-d1-monitor.tar.gz` |
-| **Nomadic D2** (only two thin wires: CAN_H and CAN_L) | [D2-monitor](D2-monitor) | `venus-data-nomadic-d2-monitor.tar.gz` |
+| **Nomadic D1** (four thin labelled wires: CAN_H, CAN_L and two 12 V wires) | [D1-monitor](D1-monitor) | [`venus-data-nomadic-d1-monitor.tar.gz`](https://github.com/CKOCI13/Nomadic-D1-and-D2-monitor-on-Victron-Cerbo-GX-MK2/raw/main/Download/venus-data-nomadic-d1-monitor.tar.gz) |
+| **Nomadic D2** (only two thin wires: CAN_H and CAN_L) | [D2-monitor](D2-monitor) | [`venus-data-nomadic-d2-monitor.tar.gz`](https://github.com/CKOCI13/Nomadic-D1-and-D2-monitor-on-Victron-Cerbo-GX-MK2/raw/main/Download/venus-data-nomadic-d2-monitor.tar.gz) |
 
 Install only **one** of them, the one that matches your converter.
 
@@ -62,8 +62,11 @@ The **Installation Guide** has pictures of every step, including how to make the
 
 ## Step 4: Install it from a USB stick
 
-1. **Download your file** from the **[latest release](https://github.com/CKOCI13/Nomadic-D1-and-D2-monitor-on-Victron-Cerbo-GX-MK2/releases/latest)**
-   (scroll down to **Assets**). On a Mac, use Chrome or Firefox, not Safari.
+1. **Download your file** (version 2.5.0). Click one, and it downloads straight away:
+   - Nomadic **D1**: **[venus-data-nomadic-d1-monitor.tar.gz](https://github.com/CKOCI13/Nomadic-D1-and-D2-monitor-on-Victron-Cerbo-GX-MK2/raw/main/Download/venus-data-nomadic-d1-monitor.tar.gz)**
+   - Nomadic **D2**: **[venus-data-nomadic-d2-monitor.tar.gz](https://github.com/CKOCI13/Nomadic-D1-and-D2-monitor-on-Victron-Cerbo-GX-MK2/raw/main/Download/venus-data-nomadic-d2-monitor.tar.gz)**
+
+   They're also in the [Download](Download) folder. On a Mac, use Chrome or Firefox, not Safari.
 2. **Copy it to the top level of the USB stick**, not inside a folder. Put only that one file on the stick. If your
    computer renamed it to something like `... (1).tar.gz`, rename it back exactly as shown in the table above.
 3. On the Cerbo, check that **Settings › General › Modification checks** allows modifications (that's the default).
