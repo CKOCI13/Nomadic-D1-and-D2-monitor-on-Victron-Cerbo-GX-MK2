@@ -66,7 +66,7 @@ The **Installation Guide** has pictures of every step, including how to make the
 
 ## Step 4: Install it from a USB stick
 
-1. **Download your file** (version 2.5.0). Click one, and it downloads straight away:
+1. **Download your file** (version 2.6.0). Click one, and it downloads straight away:
    - Nomadic **D1**: **[venus-data-nomadic-d1-monitor.tar.gz](https://github.com/CKOCI13/Nomadic-D1-and-D2-monitor-on-Victron-Cerbo-GX-MK2/raw/main/Download/venus-data-nomadic-d1-monitor.tar.gz)**
    - Nomadic **D2**: **[venus-data-nomadic-d2-monitor.tar.gz](https://github.com/CKOCI13/Nomadic-D1-and-D2-monitor-on-Victron-Cerbo-GX-MK2/raw/main/Download/venus-data-nomadic-d2-monitor.tar.gz)**
 
